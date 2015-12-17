@@ -14,6 +14,8 @@ Adds the following on top of Django's startproject template
 * Settings configured with a good default logging configuration
 * A starter `.gitignore`
 * A starter `requirements.txt`
+* Defined urls for django built-in authentication views (login,
+  logout, and password change) and settings configured to use them.
 
 ## Getting Started
 The bare minimum to get a working project is:
