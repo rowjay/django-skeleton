@@ -11,7 +11,10 @@ Adds the following on top of Django's startproject template
     messages from the messages framework, and shows the currently logged-in
     user, and a link to logout.
   * `login.html` has a minimal login form
-  * `logout.html` has a a logout message and a link to log in again
+  * `logout.html` has a logout message and a link to log in again
+  * `password_change.html` has a minimal password change form
+  * `password_change_done.html` has a success message and a link to the
+    'home' view
 
 * A settings file split into a `common_settings.py` and `settings.ex.py`.
 * Settings configured for a top-level static files directory
@@ -20,7 +23,8 @@ Adds the following on top of Django's startproject template
 * A starter `.gitignore`
 * A starter `requirements.txt`
 * Defined urls for django built-in authentication views (login,
-  logout, and password change) and settings configured to use them.
+  logout, and password change) and settings configured to use them
+  (`LOGIN_URL`, `LOGOUT_URL`, and `LOGIN_REDIRECT_URL`).
 
 ## Getting Started
 The bare minimum to get a working project is:
@@ -55,7 +59,7 @@ The bare minimum to get a working project is:
 
 ## About base.html
 
-The base template is a simple bootstrap-based html template. It has 3 content
+The base template is a simple bootstrap-based html template. It has 4 content
 blocks to override in sub-templates:
 
 * `header` is used to insert items into the header of the page, such as
@@ -64,9 +68,10 @@ blocks to override in sub-templates:
   `<div>` with class `container`
 * `scripts` is a block at the very end of the body, which can be used to
   insert javascript blocks.
+* `title` overrides the document title.
 
-## TODO
+## Notes
 
-Things that I would like to add to this skeleton in the future:
-
-* Starter templates for password changes
+* A view named 'home' is referenced in the starter templates and in the
+  `LOGIN_REDIRECT_URL` setting. If you change the home view to be named
+  something else, make sure you update these references.
