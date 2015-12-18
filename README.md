@@ -5,9 +5,14 @@ for Django 1.9
 ## Features
 Adds the following on top of Django's startproject template
 
-* A set of starter html templates using bootstrap and jquery. `base.html` is
-  a minimal bootstrap template. It also shows any pending Django
-  messages from the messages framework.
+* A set of starter html templates using bootstrap and jquery.
+
+  * `base.html` is a minimal bootstrap template. It also shows any pending Django
+    messages from the messages framework, and shows the currently logged-in
+    user, and a link to logout.
+  * `login.html` has a minimal login form
+  * `logout.html` has a a logout message and a link to log in again
+
 * A settings file split into a `common_settings.py` and `settings.ex.py`.
 * Settings configured for a top-level static files directory
 * Settings configured for a top-level templates directory
@@ -64,4 +69,4 @@ blocks to override in sub-templates:
 
 Things that I would like to add to this skeleton in the future:
 
-* Starter login, logout, and password change templates
+* Starter templates for password changes
