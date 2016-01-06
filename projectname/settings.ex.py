@@ -8,7 +8,6 @@ from .common_settings import *
 # Before deploying to production, uncomment and configure the following:
 
 #DEBUG = False
-#SECRET_KEY = ...
 #ALLOWED_HOSTS = []
 
 #DATABASE=...

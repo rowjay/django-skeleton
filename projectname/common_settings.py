@@ -20,7 +20,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '5*6g8$e1i41*=7nbf+^t6!un6x9efnd+$i!0#7z@ckv!@4(%g='
+# This generates a secret key the first time it's accessed
+secret_key_path = os.path.join(BASE_DIR, "secret.txt")
+if os.path.exists(secret_key_path):
+    SECRET_KEY = open(secret_key_path, "r").read().strip()
+else:
+    import django.utils.crypto
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    SECRET_KEY = django.utils.crypto.get_random_string(50, chars)
+    # Create the file such that only the current user can read it
+    fd = os.open(secret_key_path,
+                 os.O_WRONLY|os.O_CREAT|os.O_TRUNC,
+                 0o600)
+    with os.fdopen(fd, "w") as keyout:
+        keyout.write(SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

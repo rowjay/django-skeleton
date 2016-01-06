@@ -20,6 +20,7 @@ Adds the following on top of Django's startproject template
 * Settings configured for a top-level static files directory
 * Settings configured for a top-level templates directory
 * Settings configured with a good default logging configuration
+* Settings configured to auto-generate a secret key on first invocation
 * A starter `.gitignore`
 * A starter `requirements.txt`
 * Defined urls for django built-in authentication views (login,
