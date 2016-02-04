@@ -160,7 +160,7 @@ LOGGING = {
                            "INFO": "white",
                            "WARNING": "yellow",
                            "ERROR": "red",
-                           "CRITICAL": "red,bg_white",
+                           "CRITICAL": "white,bg_red",
                            }
         },
         "nocolor": {
