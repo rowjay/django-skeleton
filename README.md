@@ -44,7 +44,6 @@ The bare minimum to get a working project is:
    * The app directory name
    * `common_settings.py` INSTALLED_APPS
    * The import statement in the project-wide `urls.py`
-   * The app's `__init__.py` AppConfig name
 
 3. Copy the `settings.ex.py` to `settings.py`. No changes are needed for
    development. It is recommended to not check this file in to version
