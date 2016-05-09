@@ -78,8 +78,9 @@ blocks to override in sub-templates:
 
 # Deployment Guide
 
-Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployments.
+Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployments. For this example we assume you are deploying your code to /opt/my-deployment-dir
 
+1. Clone a copy of your code to /opt/my-deployment-dir. This should put your manage.py at /opt/my-deployment-dir/manage.py
 1. Install Nginx and supervisor
 2. Create a Python virtualenv and install your project’s dependencies + gunicorn into it. For this example the base dir is /opt/my-deployment-dir and the virtualenv is /opt/my-deployment-dir/env
 3. Create a user and group for your code to run as. For this example we use project-user and project-group
@@ -126,3 +127,17 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
 10. restart nginx with "sudo nginx -s reload"
 11. sudo systemctl enable nginx
 12. sudo systemctl enable supervisord
+
+## Deployment notes and tips:
+
+* I like to make a git branch named for that deployment. For example, I may make a branch called "my-deployment.oscar.ncsu.edu" and check out that branch. Then I can continue to develop on the master branch, and merge changes into the deployment branch and follow the instructions below to update the deployment
+* With the above technique, I can check in any deployment-specific files such as settings.py to keep revisions and backups of critical files. Only push changes back if the remote repository is not public or if there are no secrets (such as db passwords) being checked in.
+
+## Deploying Changes
+
+To update a deployment with new changes:
+
+1. cd to /opt/my-deployment-dir
+2. run "git pull --ff-only". In general, you don't want to be doing any committing or merging out of the deployment working copy.
+3. run "./env/bin/python manage.py migrate" to update the database with any new schema changes
+4. run "sudo supervisorctl restart all" to restart all running gunicorn processes
