@@ -75,3 +75,54 @@ blocks to override in sub-templates:
 * A view named 'home' is referenced in the starter templates and in the
   `LOGIN_REDIRECT_URL` setting. If you change the home view to be named
   something else, make sure you update these references.
+
+# Deployment Guide
+
+Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployments.
+
+1. Install Nginx and supervisor
+2. Create a Python virtualenv and install your project’s dependencies + gunicorn into it. For this example the base dir is /opt/my-deployment-dir and the virtualenv is /opt/my-deployment-dir/env
+3. Create a user and group for your code to run as. For this example we use project-user and project-group
+4. Create a supervisor config in /etc/supervisord/myproject.ini containing:
+   
+   ```
+   [program:myproject]
+   directory = /opt/my-deployment-dir
+   command = /opt/my-deployment-dir/env/bin/gunicorn --env DJANGO_SETTINGS_MODULE=project.settings --pythonpath /opt/my-deployment-dir/ --bind=unix:/opt/my-deployment-dir/gunicorn.sock project.wsgi
+   stdout_logfile = /opt/my-deployment-dir/stdout.log
+   redirect_stderr = true
+   autostart = true
+   autorestart = true
+   user = project-user
+   group = project-group
+   ```
+
+5. sudo systemctl restart supervisord
+6. sudo supervisorctl status
+7. Create an nginx config in /etc/nginx/conf.d/myproject.conf containing:
+
+   ```
+   upstream gunicorn {
+       server unix:/opt/my-deployment-dir/gunicorn.sock fail_timeout=0;
+   }
+
+   server {
+       listen 80;
+       server_name my-hostname.oscar.ncsu.edu my-hostname.oscar.priv;
+   
+       location /static/ {
+           alias /opt/my-deployment-dir/static-root/
+       }
+       location / {
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header Host $http_host;
+           proxy_redirect off;
+           proxy_pass http://gunicorn;
+       }
+   }
+   ```
+8. Configure the django project for /opt/my-deployment-dir/static-root to be the STATIC_ROOT and run manage.py collectstatic
+9. test ngix config with "sudo nginx -t"
+10. restart nginx with "sudo nginx -s reload"
+11. sudo systemctl enable nginx
+12. sudo systemctl enable supervisord
