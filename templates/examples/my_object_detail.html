@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% comment %}
+This is the template used by the object_details view from views.py
+Our job is to show details about one particular object.
+{% endcomment %}
+
+{% block title %}
+    My Object {{ object.name }}
+{% endblock %}
+
+{% block content %}
+    <a href="{% url "object_list" %}">Back to object list</a>
+    <div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>Info on object {{ object }}</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table">
+            <tr>
+                <td>Name:</td>
+                <td>{{ object.name }}</td>
+            </tr>
+            <tr>
+                <td>Owner</td>
+                <td>{{ object.owner }}</td>
+            </tr>
+            <tr>
+                <td>my context var:</td>
+                <td>{{ my_context_var }}</td>
+            </tr>
+        </table>
+        <a href="{% url "object_edit" object.id %}">Edit this object</a>
+    </div>
+    </div>
+{% endblock %}

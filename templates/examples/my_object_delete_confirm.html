@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% comment %}
+This is the template used by the object_delete view from views.py
+Our job is to show a confirmation before deleting an object
+{% endcomment %}
+
+{% block title %}
+    Confirm delete {{ object.name }}
+{% endblock %}
+
+{% block content %}
+    <a href="{% url "object_list" %}">Back to object list</a>
+    <div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>Confirm deletion of object {{ object }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="alert alert-danger" role="alert">
+            Are you sure you want to delete "{{ object }}"?
+        </div>
+        <form action="{% url "object_delete" object.id %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-default btn-danger"
+                    type="submit">Delete</button>
+        </form>
+    </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% comment %}
+This is the template used by the object_create view from views.py
+Our job is to render the form for creating new MyObject objects
+{% endcomment %}
+
+{% block title %}
+Create a new Object
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>Create a new Object</h3>
+    </div>
+    <div class="panel-body">
+        <form action="{% url "object_new" %}" method="post">
+            {% csrf_token %}
+            {% comment %}
+            This is the simplest way to render a form, where Django creates
+            most of the HTML for us. See this docs page for more ways to
+            render a form in templates:
+            https://docs.djangoproject.com/en/1.9/topics/forms/#working-with-form-templates
+            {% endcomment %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-default">Create</button>
+        </form>
+    </div>
+    </div>
+{% endblock %}

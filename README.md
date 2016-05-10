@@ -64,6 +64,41 @@ The bare minimum to get a working project is:
 5. You now have a working development environment. Run the django test server
    with `./env/bin/python manage.py runserver`
 
+6. In order to bootstrap a user into the django users table, run
+   `./env/bin/python manage.py createsuperuser`
+   This user will be created with full permissions to everything. You can log
+   into the admin site (hosted out of the url /admin by default) to create more
+   users and other database objects.
+
+## Code Tour
+
+Take a look through the code. It's heavily commented towards those new at
+Django. In particular, take a look at these files:
+
+* project/urls.py is the project-wide urls file. You generally will not need
+  to change this, and will want to add your urls to:
+* appname/urls.py is the app urls file. The urls file contains mappings from
+  url patterns to view functions. Add new urls here.
+* appname/views.py is the heart of your app. Django views are responsible for
+  translating an incoming request into an outgoing response.
+* appname/models.py contains definitions for your database models. It defines
+  both your database schema, and the python classes that represent them with
+  Django's object-relational mapper
+* appname/forms.py defines any form classes used by your views
+* appname/admin.py defines the ModelAdmin classes so your can manager your
+  models from django's admin interface. (Browse to /admin to see it!)
+* appname/tests.py contain unit tests for your app.
+
+* The templates directory holds templates for your app. Our convention is to
+  have a single top-level directory for all templates for a project, but
+  sometimes it's more appropriate to have per-app template directories.
+  Django lets you customize how to load templates and where to search for them.
+
+* The static directory holds static files for your app. Our convention, like
+  the templates directory, is to have a single top-level directory for all
+  static files. Also like templates, Django lets you customize where to
+  search for static files, and you can have per-app static directories as well.
+
 ## About base.html
 
 The base template is a simple bootstrap-based html template. It has 4 content

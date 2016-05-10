@@ -23,7 +23,7 @@ from appname import urls
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    # Auth urls
+    # Auth urls. We use django's built in views for these.
     url(r'^accounts/login$', django.contrib.auth.views.login,
         {'template_name': 'login.html'},
         name="login"),
