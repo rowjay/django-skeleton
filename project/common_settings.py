@@ -150,13 +150,17 @@ STATICFILES_DIRS = [
 #
 # Each logger may have a level. A message also has a level. A message is
 # emitted if its level is greater than its logger's level, or in case its
-# logger doesn't have a level, the next one down in the hierarchy (all the
-# way until it hits the root, which always has a level)
+# logger doesn't have a level, the next one down in the hierarchy (repeat all
+# the way until it hits the root, which always has a level). Note that the
+# first logger with a level is the ONLY logger whose level is used in this
+# decision.
 #
 # Each logger may have zero or more handlers, which determine what to do with
-# a message (e.g. print it, email it, write to a file). A message travels down
-# the hierarchy, being sent to each handler at each logger, until it reaches
-# the root logger or a logger marked with propagate=False.
+# a message that is to be emitted (e.g. print it, email it, write to a file). A
+# message that passes the level test travels down the hierarchy, being sent
+# to each handler at each logger, until it reaches the root logger or a
+# logger marked with propagate=False. Each handler may do level checks or
+# additional filtering of its own.
 #
 #
 # Typically, you will want to log messages within your application under your
