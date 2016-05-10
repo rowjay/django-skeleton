@@ -139,6 +139,22 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
 
 * I like to make a git branch named for that deployment. For example, I may make a branch called "my-deployment.oscar.ncsu.edu" and check out that branch. Then I can continue to develop on the master branch, and merge changes into the deployment branch and follow the instructions below to update the deployment
 * With the above technique, I can check in any deployment-specific files such as settings.py to keep revisions and backups of critical files. Only push changes back if the remote repository is not public or if there are no secrets (such as db passwords) being checked in.
+* By default, Supervisor rotates the stdout log file after 50 megabytes and
+  keeps 10 past backups. You may consider tweaking these parameters in the
+  supervisor config.
+
+  For some situations, it's more appropriate to change Python's logging
+  configuration to have Python log to a file instead of stderr so that Python
+  can handle the log rotation instead of supervisor (using the
+  RotatingFileHandler or TimedRotatingFileHandler). You will need to decide
+  for yourself which makes the most sense for your situation.
+
+  It usually makes sense to have supervisor perform the logging, so any
+  erroneous writes to stdout or stderr by python outside of the logging
+  system go to the same file. On the other hand, you may want to
+  separate them if you want your log files in a consistent format, and you're
+  using some library that's being rude and doing its own writing to stderr
+  instead of using python logging.
 
 ## Deploying Changes
 
