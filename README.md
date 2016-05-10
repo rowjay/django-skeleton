@@ -30,32 +30,39 @@ Adds the following on top of Django's startproject template
 ## Getting Started
 The bare minimum to get a working project is:
 
-1. Create a virtualenv and install the requirements listed in `requirements.txt`
-2. Change the project name in the following places:
+1. Create a virtual environment and install the requirements listed in
+   `requirements.txt`
 
-   * The project directory name
-   * `common_settings.py` ROOT_URLCONF
-   * `common_settings.py` WSGI_APPLICATION
-   * `wsgi.py` the default settings module path
-   * `manage.py` the default settings module path
+   * In this directory, run `virtualenv -p /usr/bin/python3.4 env`
+   * Now run `env/bin/pip install -r requirements.txt`
+   * For convenience in later commands, activate your virtualenv for this
+     terminal with `source ./env/bin/activate`. You can replace
+     `./env/bin/python` with just `python` in subsequent commands in an
+     activated environment.
 
-3. Change the app name in the following places:
+2. Unless you want an app named "appname", change the app name in the following
+   places:
 
-   * The app directory name
-   * `common_settings.py` INSTALLED_APPS
+   * The app directory name itself
+   * In `common_settings.py` the INSTALLED_APPS setting
    * The import statement in the project-wide `urls.py`
 
-3. Copy the `settings.ex.py` to `settings.py`. No changes are needed for
-   development. It is recommended to not check this file in to version
-   control. As per our convention, settings common to all deployments go in
-   `common_settings.py` which is checked in to version control.
-   Deployment-specific settings go in `settings.py` which is not checked in
-   to version control, or is checked in only on a deployment-specific branch.
+3. In the project directory, copy the `settings.ex.py` to `settings.py`. No
+   changes are needed for development. It is recommended to not check this
+   file in to version control. As per our convention, settings common to all
+   deployments go in `common_settings.py` which is checked in to version
+   control. Deployment-specific settings go in `settings.py` which is not
+   checked in to version control, or is checked in only on a
+   deployment-specific branch.
 
-4. The app should run now. You probably want to do the following at some
-   point, though:
+   See the comments in settings.ex.py for more information.
 
-   * Change the project title and navbar header in base.html
+4. Create your database and initial schemas with
+   `./env/bin/python manage.py migrate`. The default database is a
+   sqlite-based file in the base directory of your project.
+
+5. You now have a working development environment. Run the django test server
+   with `./env/bin/python manage.py runserver`
 
 ## About base.html
 
@@ -140,4 +147,5 @@ To update a deployment with new changes:
 1. cd to /opt/my-deployment-dir
 2. run "git pull --ff-only". In general, you don't want to be doing any committing or merging out of the deployment working copy.
 3. run "./env/bin/python manage.py migrate" to update the database with any new schema changes
-4. run "sudo supervisorctl restart all" to restart all running gunicorn processes
+4. run "./env/bin/python manage.py collectstatic" to update the static files
+5. run "sudo supervisorctl restart all" to restart all running gunicorn processes

@@ -35,3 +35,13 @@ ADMINS = [
     #('Admin Name', 'adminemail@example.com'),
 ]
 
+# Django's test server serves static files for you, but in production,
+# Django expects your web server to take care of that. You will need to set
+# STATIC_ROOT to a directory on your filesystem, and STATIC_URL to something
+# like "/static/". Then configure your webserver to serve that directory at
+# that url.
+# Finally, run "manage.py collectstatic" and django will copy static files
+# from various places into your STATIC_ROOT. You need to re-run collectstatic
+# each time you redeploy with changes to static files.
+#STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
+#STATIC_URL = "/static/"
