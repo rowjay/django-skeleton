@@ -1,6 +1,6 @@
 # Django Skeleton
 
-for Django 1.9
+for Django 1.9. Should work with either Python 3.4 or 2.7 (3.4 is preferred)
 
 ## Features
 Adds the following on top of Django's startproject template
