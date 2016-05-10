@@ -2,21 +2,22 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from .common_settings import *
 
-# Rename this file to settings.py to deploy this app.
+# Copy this file to settings.py to deploy this app.
 
 # This file contains deployment-specific settings. It can also override any
 # settings in common_settings.py
-# You should leave this file out of source control (but still back it up
-# somehow in production)
+# You should leave settings.py out of source control (but still back
+# it up somehow in production)
 
-# You can run without adding anything to this file, but it's unsuitable for
-# production
+# You can run the django test server without adding anything to this file,
+# but it's unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
-# The common settings file has defaults for development.
 # Before deploying to production, uncomment and configure at least the
 # following:
 
+# Set this to False to turn off debug tracebacks to the browser on unhandled
+# exceptions
 #DEBUG = False
 
 # With DEBUG off, Django checks that the Host header in requests matches one of
