@@ -16,8 +16,8 @@ method.
 
 For forms that aren't a simple interface to a database model, you can create
 a class that inherits from django.forms.Form and declare the fields yourself.
-Look at the generic view FormView for use with regular forms. CreateView and
-UpdateView are meant to work with model forms.
+You can then use the generic view FormView for use with regular forms.
+CreateView and UpdateView are meant to work with model forms.
 
 See https://docs.djangoproject.com/en/1.9/topics/forms/
 and https://docs.djangoproject.com/en/1.9/topics/forms/modelforms/

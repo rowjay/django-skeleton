@@ -15,19 +15,21 @@ response object. The routing of URLs to views is defined in your urls.py file.
 We like to use Django Class-based Views. They are a little confusing but
 basically, a hierarchy of Python classes each provide bits of functionality
 that together make the view function. With class based views, the view
-"function" comes from the class's as_view() classmethod.
+function is returned from the class's as_view() classmethod.
 
 When a class-based view is invoked, a dispatch() method is called,
 which looks at the HTTP request method and dispatches to e.g. a get() or a
 post() method.
 
 The views in the django.views.generic module provide base functionality for
-rendering templates, retrieving objects from a database, processing forms, etc.
+rendering templates, retrieving objects from a database, processing forms,
+etc. With Django's generic views, you typically only need to define one or
+two class attributes, and override one or two methods to have a working view.
 
 For more information about class based views, see
 https://docs.djangoproject.com/en/1.9/topics/class-based-views/
 
-A good reference for the different generic class based views Django provides is
+A good reference for the generic class based views Django provides is
 https://ccbv.co.uk/
 
 This views.py file comes with some examples to illustrate how they work. You

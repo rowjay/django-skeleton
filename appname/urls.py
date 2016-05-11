@@ -15,8 +15,9 @@ urlpatterns = [
     url(r"objlist/new$", views.new_object, name="object_new"),
 
     # We use named regular expression capture groups because they're easier
-    # to manage. We use the name "pk" here because that's the default keyword
-    # that Django generic views look for
+    # to manage, and required by the generic class based views. We use the name
+    # "pk" here because that's the default keyword that Django generic views
+    # look for
     url(r"objlist/(?P<pk>.+)/$", views.object_details, name="object_details"),
     url(r"objlist/(?P<pk>.+)/delete$", views.object_delete, name="object_delete"),
     url(r"objlist/(?P<pk>.+)/edit$", views.object_edit, name="object_edit"),
