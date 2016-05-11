@@ -49,7 +49,9 @@ class MyObject(models.Model):
         view to use as the detail view
 
         In particular, this method is used by default in Django's generic
-        views to redirect to an object's details page after a create or update.
+        views to redirect to an object's details page after a create or
+        update. It's also used by the admin site to provide the "view on
+        site" link.
         """
         return reverse("object_details", args=[self.id])
 

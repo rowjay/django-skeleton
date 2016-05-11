@@ -144,39 +144,44 @@ STATICFILES_DIRS = [
 # https://docs.python.org/3.4/library/logging.html
 #
 # The brief 3-paragraph summary is:
-# Loggers form a tree hierarchy. A log message is emitted to a logger
-# somewhere in this tree, and the hierarchy is used to determine what to do
-# with the message.
+# Loggers form a tree hierarchy. A log message is submitted to a logger
+# somewhere in this tree, and the hierarchy is used to determine whether to
+# emit the message and then what to do with the message.
 #
-# Each logger may have a level. A message also has a level. A message is
-# emitted if its level is greater than its logger's level, or in case its
-# logger doesn't have a level, the next one down in the hierarchy (repeat all
-# the way until it hits the root, which always has a level). Note that the
-# first logger with a level is the ONLY logger whose level is used in this
-# decision.
+# Each logger may have a level defined. A message is submitted with a level
+# to a logger. A message is emitted if its level is greater than its logger's
+# level. If its logger doesn't have a level, the first logger down the tree
+# towards the root that has a level is used for the comparison. (the root
+# logger always has a level) Note that the first logger with a level is the
+# ONLY logger whose level is used in this decision.
 #
 # Each logger may have zero or more handlers, which determine what to do with
 # a message that is to be emitted (e.g. print it, email it, write to a file). A
-# message that passes the level test travels down the hierarchy, being sent
-# to each handler at each logger, until it reaches the root logger or a
-# logger marked with propagate=False. Each handler may do level checks or
-# additional filtering of its own.
+# message that passes the level test travels down the hierarchy from the
+# logger it was submitted to, being sent to each handler at each logger,
+# until it reaches the root logger or a logger marked with propagate=False.
+# Each handler may do level checks or additional filtering of its own.
 #
 #
 # Typically, you will want to log messages within your application under your
 # own logger or a sublogger for each component, often named after the modules,
-# such as "myapp.views",  "myapp.models", etc. Then you can customize what to
-# do with messages from different components of your app.
+# such as "myapp.views",  "myapp.models", etc. This allows you to customize
+# what to do with messages from different components of your app.
 #
-# You don't need to declare a loggers in the config; they are created
-# implicitly with no level and no handlers when calling logging.getLogger()
+# You don't need to declare every logger you use in the config; they are created
+# implicitly with no level and no handlers when calling logging.getLogger().
+# You only need to declare a logger below if you want to change its level or
+# add a handler.
 #
 #
 # Note: if you are getting a lot of DEBUG or INFO level log messages from
-# third party libraries, a good change to make is:
+# third party libraries that you don't care about, a good change to make is:
 # * Set the root logger level to "WARNING"
 # * Add a logger for your project and set its level to DEBUG or INFO
 # * Use your logger or a sub-logger of it throughout your project
+# By changing the root logger to WARNING, this sets the level for all loggers
+# that don't declare a level. So you can get DEBUG or INFO logs from your
+# app, while only getting WARNINGS from other libraries.
 import sys
 LOGGING = {
     "version": 1,

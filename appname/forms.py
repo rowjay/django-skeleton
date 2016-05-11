@@ -3,20 +3,24 @@ import django.forms
 from . import models
 
 """
-By convention, Django form classes are declared in this file.
+By Django convention, form classes for an app are declared in a file called
+forms.py
 
-Here we declare a single MyObjectForm, a ModelForm that provides a form from
+Here we declare a single MyObjectForm, a ModelForm that provides a form for
 the MyObject model.
 
-A ModelForm will look a the referenced model class and automatically create
-form fields from the corresponding fields on the model object. ModelForms
+A ModelForm will inspect the referenced model class and automatically create
+form fields from the corresponding fields on the model object. A ModelForm
 also know how to create and save the model objects with the form's .save()
 method.
 
 For forms that aren't a simple interface to a database model, you can create
 a class that inherits from django.forms.Form and declare the fields yourself.
+Look at the generic view FormView for use with regular forms. CreateView and
+UpdateView are meant to work with model forms.
 
 See https://docs.djangoproject.com/en/1.9/topics/forms/
+and https://docs.djangoproject.com/en/1.9/topics/forms/modelforms/
 """
 
 class MyObjectForm(django.forms.ModelForm):

@@ -3,7 +3,8 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    # A view named "home" is referenced in a few places.
+    # This view is referenced from common_settings for the LOGIN_REDIRECT_URL
+    # setting.
     # Make sure to update the references if you change or delete this url line!
     url(r"^$", views.home, name="home"),
 
