@@ -85,7 +85,7 @@ Django. In particular, take a look at these files:
   both your database schema, and the python classes that represent them with
   Django's object-relational mapper
 * appname/forms.py defines any form classes used by your views
-* appname/admin.py defines the ModelAdmin classes so your can manager your
+* appname/admin.py defines the ModelAdmin classes so your can manage your
   models from django's admin interface. (Browse to /admin to see it!)
 * appname/tests.py contain unit tests for your app.
 
