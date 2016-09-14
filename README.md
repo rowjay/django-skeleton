@@ -119,7 +119,7 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
        server_name my-hostname.oscar.ncsu.edu my-hostname.oscar.priv;
    
        location /static/ {
-           alias /opt/my-deployment-dir/static-root/
+           alias /opt/my-deployment-dir/static-root/;
        }
        location / {
            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
