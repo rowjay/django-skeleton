@@ -11,7 +11,7 @@ from .common_settings import *
 
 # You can run the django test server without adding anything to this file,
 # but it's unsuitable for production
-# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # Before deploying to production, uncomment and configure at least the
 # following:
@@ -26,7 +26,7 @@ from .common_settings import *
 #ALLOWED_HOSTS = []
 
 # Set your production database parameters here! See
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 #DATABASE=...
 
 # When DEBUG is off, these email addresses will receive an email for any
