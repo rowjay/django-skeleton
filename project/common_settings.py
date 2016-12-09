@@ -50,6 +50,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'appname',
+
+    # Uncomment for oauth
+    #'oauth',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -113,6 +116,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Authentication Backends
+# https://docs.djangoproject.com/en/1.10/ref/settings/#authentication-backends
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+
+    # Uncomment for oauth authentication
+    #'oauth.authbackend.OAuthBackend',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

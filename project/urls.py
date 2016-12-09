@@ -23,6 +23,9 @@ from appname import urls
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
+    # Uncomment for oauth support
+    #url(r'^oauth/', include("oauth.urls")),
+
     # Auth urls
     url(r'^accounts/login$', django.contrib.auth.views.login,
         {'template_name': 'login.html'},
