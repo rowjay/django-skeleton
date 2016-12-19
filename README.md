@@ -33,7 +33,7 @@ The bare minimum to get a working project is:
 1. Create a virtual environment and install the requirements listed in
    `requirements.txt`
 
-   * In this directory, run `virtualenv -p /usr/bin/python3.4 env`
+   * In this directory, run `virtualenv -p /usr/bin/python3.5 env`
    * Now run `env/bin/pip install -r requirements.txt`
    * For convenience in later commands, activate your virtualenv for this
      terminal with `source ./env/bin/activate`. You can replace
