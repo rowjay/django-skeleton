@@ -104,10 +104,10 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    user = project-user
    group = project-group
    ```
+   
+   Note: for production deployments you may want to add e.g. `-w 4` to the gunicorn command to spawn multiple workers.
 
-5. sudo systemctl restart supervisord
-6. sudo supervisorctl status
-7. Create an nginx config in /etc/nginx/conf.d/myproject.conf containing:
+5. Create an nginx config in /etc/nginx/conf.d/myproject.conf containing:
 
    ```
    upstream gunicorn {
@@ -129,7 +129,14 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
        }
    }
    ```
-8. Configure the django project for /opt/my-deployment-dir/static-root to be the STATIC_ROOT and run manage.py collectstatic
+6. Copy the example settings.ex.py to settings.py and configure:
+   
+   * Configure the django project for /opt/my-deployment-dir/static-root to be the STATIC_ROOT and run manage.py collectstatic
+   * Configure the database parameters and run manage.py migrate
+   * If this is a production deployment, set DEBUG to false and set the ALLOWED_HOSTS
+   
+7. sudo systemctl restart supervisord
+8. `sudo supervisorctl status` to make sure the workers started okay.
 9. test ngix config with "sudo nginx -t"
 10. restart nginx with "sudo nginx -s reload"
 11. sudo systemctl enable nginx
