@@ -91,7 +91,7 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
 1. Install Nginx and supervisor
 2. Create a Python virtualenv and install your project’s dependencies + gunicorn into it. For this example the base dir is /opt/my-deployment-dir and the virtualenv is /opt/my-deployment-dir/env
 3. Create a user and group for your code to run as. For this example we use project-user and project-group
-4. Create a supervisor config in /etc/supervisord/myproject.ini containing:
+4. Create a supervisor config in /etc/supervisord.d/myproject.ini containing:
    
    ```
    [program:myproject]
