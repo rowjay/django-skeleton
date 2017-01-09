@@ -129,6 +129,18 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
        }
    }
    ```
+   
+   Note: it is sometimes a good idea to put the socket file in e.g. /opt/my-deployment-dir/run if you want to have the server run as a different user than the user that owns /opt/my-deployment-dir.
+   
+   Note: If running selinux, nginx won't be able to read the socket file. You can give nginx read-write permissions to all files in a directory with these commands:
+   
+   ```
+   # yum install policycoreutils-python
+   # semanage fcontext -a -t httpd_sys_rw_content_t "/opt/my-deployment-dir/run(/.*)?"
+   # restorecon -vR /opt/my-deployment-dir/run
+   ```
+   [Read more about the different context types that RedHat/CentOS uses with web servers](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html-single/Managing_Confined_Services/#sect-Managing_Confined_Services-The_Apache_HTTP_Server-Types)
+   
 6. Copy the example settings.ex.py to settings.py and configure:
    
    * Configure the django project for /opt/my-deployment-dir/static-root to be the STATIC_ROOT and run manage.py collectstatic
