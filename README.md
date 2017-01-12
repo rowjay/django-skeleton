@@ -33,7 +33,7 @@ The bare minimum to get a working project is:
 1. Create a virtual environment and install the requirements listed in
    `requirements.txt`
 
-   * In this directory, run `virtualenv -p /usr/bin/python3.4 env`
+   * In this directory, run `virtualenv -p /usr/bin/python3.5 env`
    * Now run `env/bin/pip install -r requirements.txt`
    * For convenience in later commands, activate your virtualenv for this
      terminal with `source ./env/bin/activate`. You can replace
@@ -91,7 +91,7 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
 1. Install Nginx and supervisor
 2. Create a Python virtualenv and install your project’s dependencies + gunicorn into it. For this example the base dir is /opt/my-deployment-dir and the virtualenv is /opt/my-deployment-dir/env
 3. Create a user and group for your code to run as. For this example we use project-user and project-group
-4. Create a supervisor config in /etc/supervisord/myproject.ini containing:
+4. Create a supervisor config in /etc/supervisord.d/myproject.ini containing:
    
    ```
    [program:myproject]
@@ -104,10 +104,10 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    user = project-user
    group = project-group
    ```
+   
+   Note: for production deployments you may want to add e.g. `-w 4` to the gunicorn command to spawn multiple workers.
 
-5. sudo systemctl restart supervisord
-6. sudo supervisorctl status
-7. Create an nginx config in /etc/nginx/conf.d/myproject.conf containing:
+5. Create an nginx config in /etc/nginx/conf.d/myproject.conf containing:
 
    ```
    upstream gunicorn {
@@ -129,7 +129,26 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
        }
    }
    ```
-8. Configure the django project for /opt/my-deployment-dir/static-root to be the STATIC_ROOT and run manage.py collectstatic
+   
+   Note: it is sometimes a good idea to put the socket file in e.g. /opt/my-deployment-dir/run if you want to have the server run as a different user than the user that owns /opt/my-deployment-dir.
+   
+   Note: If running selinux, nginx won't be able to read the socket file. You can give nginx read-write permissions to all files in a directory with these commands:
+   
+   ```
+   # yum install policycoreutils-python
+   # semanage fcontext -a -t httpd_sys_rw_content_t "/opt/my-deployment-dir/run(/.*)?"
+   # restorecon -vR /opt/my-deployment-dir/run
+   ```
+   [Read more about the different context types that RedHat/CentOS uses with web servers](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html-single/Managing_Confined_Services/#sect-Managing_Confined_Services-The_Apache_HTTP_Server-Types)
+   
+6. Copy the example settings.ex.py to settings.py and configure:
+   
+   * Configure the django project for /opt/my-deployment-dir/static-root to be the STATIC_ROOT and run manage.py collectstatic
+   * Configure the database parameters and run manage.py migrate
+   * If this is a production deployment, set DEBUG to false and set the ALLOWED_HOSTS
+   
+7. sudo systemctl restart supervisord
+8. `sudo supervisorctl status` to make sure the workers started okay.
 9. test ngix config with "sudo nginx -t"
 10. restart nginx with "sudo nginx -s reload"
 11. sudo systemctl enable nginx
