@@ -149,10 +149,103 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    
 7. sudo systemctl restart supervisord
 8. `sudo supervisorctl status` to make sure the workers started okay.
-9. test ngix config with "sudo nginx -t"
+9. test nginx config with "sudo nginx -t"
 10. restart nginx with "sudo nginx -s reload"
 11. sudo systemctl enable nginx
 12. sudo systemctl enable supervisord
+
+### SSL Setup
+
+To get LetsEncrypt running on the Nginx instance you just set up, follow 
+these steps
+
+(adapted from <https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04>
+and <https://certbot.eff.org/#centosrhel7-nginx>)
+
+1. `yum install certbot` (assumes CentOS7 and epel repos installed)
+2. Create a directory somewhere on the filesystem such as /opt/webroot
+3. Add a new location block to your nginx config that looks like this:
+
+   ```
+   location ~ /.well-known {
+       root /opt/webroot;
+   }
+   ```
+   and reload nginx with `nginx -s reload`
+
+3. Run `certbot certonly`
+
+   This will ask you for your domain name and web root. If successful, it 
+   will go ahead and issue you your cert
+   
+4. Generate strong dh parameters with 
+
+   ```openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048```
+   
+5. Modify your nginx config. Add a new server block at the top that looks 
+like this:
+
+   ```
+   server {
+        listen 80;
+        server_name my-hostname.example.com;
+        return 301 https://$server_name$request_uri;
+   }
+   ```
+   
+   And then modify your existing server block by replacing the location line 
+   with:
+   ```location 443 ssl;```
+   
+   And adding these parameters:
+   ```
+        ssl_certificate /etc/letsencrypt/live/my-hostname.example.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/my-hostname.example.com/privkey.pem;
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+        ssl_ecdh_curve secp384r1;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_tickets off;
+        ssl_stapling on;
+        ssl_stapling_verify on;
+        add_header Strict-Transport-Security "max-age=6307200; includeSubdomains";
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nostiff;
+        ssl_dhparam /etc/ssl/certs/dhparam.pem;
+   ```
+   (That full set of parameters will score you an A on ssl testers, but not 
+   all of them may be necessary)
+   
+   Add this line to your `location /` block:
+   
+   ```   proxy_set_header X-Forwarded-Proto $scheme```
+   
+   Test and reload your nginx config
+   
+   ```
+   # nginx -t
+   # nginx -s reload
+   ```
+   
+6. Add this configuration option to your settings.py:
+
+   ```SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')```
+   
+7. Configure certbot to renew certificates automatically:
+
+   run `certbot renew --dry-run` to make sure everything looks okay
+   
+   Edit root's crontab with `sudo crontab -e` and add this line:
+   
+   ```
+    RANDOM_DELAY=60
+    0 7 * * * certbot renew --quiet --post-hook "nginx -s reload"
+   ```
+   This attempts renewal once a day at a random minute between 7 and 8am. The
+   renew command only actually renewws if the cert expires within 30 days. It
+    is recommended to run this often in case the cert was revoked earlier 
+    than expected
 
 ## Deployment notes and tips:
 
