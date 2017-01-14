@@ -128,6 +128,7 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
        }
        location / {
            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
            proxy_set_header Host $http_host;
            proxy_redirect off;
            proxy_pass http://gunicorn;
@@ -135,16 +136,16 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    }
    ```
    
+   Note: You must include the X-Forwarded-Proto line even if not using ssl, 
+   because gunicorn interprets this header by default, and indicates via 
+   enviornment variables to Django. So this must be set to make sure clients 
+   can't fake Django into thinking a request is secure.
+   
    Note: it is sometimes a good idea to put the socket file in e.g. 
    /opt/my-deployment-dir/run if you want to have the server run as a 
    different user than the user that owns /opt/my-deployment-dir. Then only 
    that one directory needs to be writable by the linux user that runs the 
    server process.
-   
-   Note: You must include the X-Forwarded-Proto line even if not using ssl, 
-   because gunicorn interprets this header by default, and indicates via 
-   enviornment variables to Django. So this must be set to make sure clients 
-   can't fake Django into thinking a request is secure.
    
    Note: If running selinux, nginx won't be able to read the socket file. You
    can give nginx read-write permissions to all files in a directory with 
@@ -211,9 +212,9 @@ like this:
    }
    ```
    
-   And then modify your existing server block by replacing the location line 
+   And then modify your existing server block by replacing the listen line 
    with:
-   ```location 443 ssl;```
+   ```listen 443 ssl;```
    
    And adding these parameters:
    ```
@@ -235,7 +236,7 @@ like this:
    (That full set of parameters will score you an A on ssl testers, but not 
    all of them may be necessary)
    
-   Add this line to your `location /` block:
+   Make sure this line is in your `location /` block:
    
    ```   proxy_set_header X-Forwarded-Proto $scheme```
    
