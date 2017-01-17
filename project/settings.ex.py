@@ -46,3 +46,9 @@ ADMINS = [
 # each time you redeploy with changes to static files.
 #STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 #STATIC_URL = "/static/"
+
+# Fill your google oauth2 credentials here if using oauth
+# When creating the google oauth2 credentials, use this as the callback url:
+# https://SERVER/oauth/provider/google/complete
+#GOOGLE_OPENIDCONNECT_KEY = ""
+#GOOGLE_OPENIDCONNECT_SECRET = ""
