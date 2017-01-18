@@ -290,6 +290,10 @@ like this:
   separate them if you want your log files in a consistent format, and you're
   using some library that's being rude and doing its own writing to stderr
   instead of using python logging.
+  
+* For production deployments, using Sentry is highly recommended. Add 'raven'
+  to the requirements.txt and uncomment the sentry lines from the example 
+  settings file.
 
 ## Deploying Changes
 

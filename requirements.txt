@@ -3,3 +3,6 @@ colorlog
 
 # Uncomment for oauth
 #oauth2client
+
+# Uncomment for sentry logging
+#raven

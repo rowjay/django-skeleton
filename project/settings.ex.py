@@ -47,8 +47,36 @@ ADMINS = [
 #STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 #STATIC_URL = "/static/"
 
+# Set your MEDIA_ROOT to some directory that's writable by your web server if
+# your app involves writing to the filesystem using the default storage class
+#MEDIA_ROOT = os.path.join(BASE_DIR, "files")
+
 # Fill your google oauth2 credentials here if using oauth
 # When creating the google oauth2 credentials, use this as the callback url:
 # https://SERVER/oauth/provider/google/complete
 #GOOGLE_OPENIDCONNECT_KEY = ""
 #GOOGLE_OPENIDCONNECT_SECRET = ""
+
+# To support sentry logging, uncomment these lines and set the DSN. You will
+# need an account on a sentry server and create a project to get a DSN.
+#
+# You will also need to install the "raven" package in your virtualenv
+# (remember to add it to your requirements.txt)
+#
+# Installing the raven_compat app will log all Django request handling
+# exceptions (500 errors)
+#
+# You may also wish to install the raven logger to capture logging warnings
+# or errors. Simply install a handler with class
+# 'raven.contrib.django.raven_compat.handlers.SentryHandler' and configure a
+# logger to use it.
+#
+# See https://docs.sentry.io/clients/python/integrations/django/
+#
+#INSTALLED_APPS.append("raven.contrib.django.raven_compat")
+#import raven
+#RAVEN_CONFIG = {
+#    'dsn': '',
+#    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+#}
+
