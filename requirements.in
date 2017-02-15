@@ -2,7 +2,7 @@ Django<1.11
 colorlog
 
 # Uncomment for oauth
-#oauth2client
+# oauth2client
 
-# Uncomment for sentry logging
-#raven
+# Uncomment for Sentry/Raven
+# raven
