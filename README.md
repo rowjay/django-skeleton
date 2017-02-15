@@ -87,16 +87,16 @@ blocks to override in sub-templates:
 
 Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployments. For this example we assume you are deploying your code to /opt/my-deployment-dir
 
-1. Clone a copy of your code to /opt/my-deployment-dir. This should put your 
+1. Clone a copy of your code to /opt/my-deployment-dir. This should put your
    manage.py at /opt/my-deployment-dir/manage.py
 1. Install Nginx and supervisor system-wide
-2. Create a Python virtualenv and install your project’s dependencies + 
+2. Create a Python virtualenv and install your project’s dependencies +
    gunicorn into it. For this example the base dir is /opt/my-deployment-dir and
    the virtualenv is /opt/my-deployment-dir/env
-3. Create a user and group for your code to run as. For this example we use 
-   project-user and project-group 
+3. Create a user and group for your code to run as. For this example we use
+   project-user and project-group
 4. Create a supervisor config in /etc/supervisord.d/myproject.ini containing:
-   
+
    ```
    [program:myproject]
    directory = /opt/my-deployment-dir
@@ -108,8 +108,8 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    user = project-user
    group = project-group
    ```
-   
-   Note: for production deployments you may want to add e.g. `-w 4` to the 
+
+   Note: for production deployments you may want to add e.g. `-w 4` to the
    gunicorn command to spawn multiple workers.
 
 5. Create an nginx config in /etc/nginx/conf.d/myproject.conf containing:
@@ -122,7 +122,7 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    server {
        listen 80;
        server_name my-hostname.example.com;
-   
+
        location /static/ {
            alias /opt/my-deployment-dir/static-root/;
        }
@@ -135,37 +135,37 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
        }
    }
    ```
-   
-   Note: You must include the X-Forwarded-Proto line even if not using ssl, 
-   because gunicorn interprets this header by default, and indicates via 
-   enviornment variables to Django. So this must be set to make sure clients 
+
+   Note: You must include the X-Forwarded-Proto line even if not using ssl,
+   because gunicorn interprets this header by default, and indicates via
+   enviornment variables to Django. So this must be set to make sure clients
    can't fake Django into thinking a request is secure.
-   
-   Note: it is sometimes a good idea to put the socket file in e.g. 
-   /opt/my-deployment-dir/run if you want to have the server run as a 
-   different user than the user that owns /opt/my-deployment-dir. Then only 
-   that one directory needs to be writable by the linux user that runs the 
+
+   Note: it is sometimes a good idea to put the socket file in e.g.
+   /opt/my-deployment-dir/run if you want to have the server run as a
+   different user than the user that owns /opt/my-deployment-dir. Then only
+   that one directory needs to be writable by the linux user that runs the
    server process.
-   
+
    Note: If running selinux, nginx won't be able to read the socket file. You
-   can give nginx read-write permissions to all files in a directory with 
+   can give nginx read-write permissions to all files in a directory with
    these commands:
-   
+
    ```
    # yum install policycoreutils-python
    # semanage fcontext -a -t httpd_sys_rw_content_t "/opt/my-deployment-dir/run(/.*)?"
    # restorecon -vR /opt/my-deployment-dir/run
    ```
    [Read more about the different context types that RedHat/CentOS uses with web servers](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html-single/Managing_Confined_Services/#sect-Managing_Confined_Services-The_Apache_HTTP_Server-Types)
-   
+
 6. Copy the example settings.ex.py to settings.py and configure:
-   
-   * Configure the django project for /opt/my-deployment-dir/static-root to 
+
+   * Configure the django project for /opt/my-deployment-dir/static-root to
    be the STATIC_ROOT and run `manage.py collectstatic`
    * Configure the database parameters and run `manage.py migrate`
-   * If this is a production deployment, set DEBUG to false and set the 
+   * If this is a production deployment, set DEBUG to false and set the
    ALLOWED_HOSTS array to your hostnames you're serving, e.g. "my-hostname.example.com"
-   
+
 7. sudo systemctl restart supervisord
 8. `sudo supervisorctl status` to make sure the workers started okay.
 9. test nginx config with "sudo nginx -t"
@@ -175,7 +175,7 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
 
 ### SSL Setup
 
-To get LetsEncrypt running on the Nginx instance you just set up, follow 
+To get LetsEncrypt running on the Nginx instance you just set up, follow
 these steps
 
 (adapted from <https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04>
@@ -194,14 +194,14 @@ and <https://certbot.eff.org/#centosrhel7-nginx>)
 
 3. Run `certbot certonly`
 
-   This will ask you for your domain name and web root. If successful, it 
+   This will ask you for your domain name and web root. If successful, it
    will go ahead and issue you your cert
-   
-4. Generate strong dh parameters with 
+
+4. Generate strong dh parameters with
 
    ```openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048```
-   
-5. Modify your nginx config. Add a new server block at the top that looks 
+
+5. Modify your nginx config. Add a new server block at the top that looks
 like this:
 
    ```
@@ -211,11 +211,11 @@ like this:
         return 301 https://$server_name$request_uri;
    }
    ```
-   
-   And then modify your existing server block by replacing the listen line 
+
+   And then modify your existing server block by replacing the listen line
    with:
    ```listen 443 ssl;```
-   
+
    And adding these parameters:
    ```
         ssl_certificate /etc/letsencrypt/live/my-hostname.example.com/fullchain.pem;
@@ -233,41 +233,41 @@ like this:
         add_header X-Content-Type-Options nostiff;
         ssl_dhparam /etc/ssl/certs/dhparam.pem;
    ```
-   (That full set of parameters will score you an A on ssl testers, but not 
+   (That full set of parameters will score you an A on ssl testers, but not
    all of them may be necessary)
-   
+
    Make sure this line is in your `location /` block:
-   
+
    ```   proxy_set_header X-Forwarded-Proto $scheme```
-   
+
    Test and reload your nginx config
-   
+
    ```
    # nginx -t
    # nginx -s reload
    ```
-   
-6. Add this configuration option to your settings.py (not necessary if 
-   running under gunicorn; gunicorn looks for this header by 
-   default if nginx connects from localhost, and indicates to Django whether 
-   the connection is secure via wsgi environ variables, which Django trusts 
+
+6. Add this configuration option to your settings.py (not necessary if
+   running under gunicorn; gunicorn looks for this header by
+   default if nginx connects from localhost, and indicates to Django whether
+   the connection is secure via wsgi environ variables, which Django trusts
    by default)
 
    ```SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')```
-   
+
 7. Configure certbot to renew certificates automatically:
 
    run `certbot renew --dry-run` to make sure everything looks okay
-   
+
    Edit root's crontab with `sudo crontab -e` and add this line:
-   
+
    ```
     RANDOM_DELAY=60
     0 7 * * * certbot renew --quiet --post-hook "nginx -s reload"
    ```
    This attempts renewal once a day at a random minute between 7 and 8am. The
    renew command only actually renews if the cert expires within 30 days. It
-   is recommended to run this often in case the cert was revoked earlier 
+   is recommended to run this often in case the cert was revoked earlier
    than expected
 
 ## Deployment notes and tips:
@@ -290,9 +290,9 @@ like this:
   separate them if you want your log files in a consistent format, and you're
   using some library that's being rude and doing its own writing to stderr
   instead of using python logging.
-  
+
 * For production deployments, using Sentry is highly recommended. Add 'raven'
-  to the requirements.txt and uncomment the sentry lines from the example 
+  to the requirements.txt and uncomment the sentry lines from the example
   settings file.
 
 ## Deploying Changes
