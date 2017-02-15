@@ -157,6 +157,22 @@ When you want to return to a tmux session, use the command `tmux attach`
 Once you exit the shell within a tmux session, that session will exit.
 
 
+## Managing new dependencies with `pip-tools`
+
+We use [`pip-tools`](https://github.com/nvie/pip-tools) to manage dependencies
+in our projects. If you need to add a dependency, do the following:
+
+1. Add the dependency to the `requirements.in` file.
+2. Activate your virtual environment.
+3. Install `pip-tools` to your virtual environment if not already present.
+4. Run `$ pip-compile --output-file requirements.txt requirements.in`.
+5. Update your virtual environment with `$ pip install -r requirements.txt`.
+
+To understand why this practice is beneficial, I'd recommend
+reading these articles [[1](http://nvie.com/posts/pin-your-packages/),
+[2](http://nvie.com/posts/better-package-management/)] from the author of `pip-tools`.
+
+
 ## Changing database models
 
 When you make changes to the database models, you must create a migration.
