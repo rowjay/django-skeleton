@@ -98,3 +98,20 @@ ADMINS = [
 #    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
 #}
 
+# Uncomment for raven/sentry logging
+# Install the "raven" package
+#INSTALLED_APPS.append("raven.contrib.django.raven_compat")
+#import raven
+#RAVEN_CONFIG = {
+#    'dsn': '', # FILL ME IN
+#    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+#}
+
+# If running under Amazon ELB or a proxy server not on localhost, uncomment
+# this line for proper detection of SSL via the X-Forwarded-Proto header
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# To force SSL if the upstream proxy server doesn't do it for us, set this to
+# True
+#SECURE_SSL_REDIRECT = False
+
