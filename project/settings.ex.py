@@ -16,9 +16,27 @@ from .common_settings import *
 # Before deploying to production, uncomment and configure at least the
 # following:
 
-# Set this to False to turn off debug tracebacks to the browser on unhandled
-# exceptions
-#DEBUG = False
+# Set this to False for production deployments
+DEBUG = True
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# This generates a secret key the first time it's accessed. For production
+# you will want to replace this entire block with something constant or
+# pulled from the environment
+# (because production deployments shouldn't have write access to the filesystem)
+secret_key_path = os.path.join(BASE_DIR, "secret.txt")
+if os.path.exists(secret_key_path):
+    SECRET_KEY = open(secret_key_path, "r").read().strip()
+else:
+    import django.utils.crypto
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    SECRET_KEY = django.utils.crypto.get_random_string(50, chars)
+    # Create the file such that only the current user can read it
+    fd = os.open(secret_key_path,
+                 os.O_WRONLY|os.O_CREAT|os.O_TRUNC,
+                 0o600)
+    with os.fdopen(fd, "w") as keyout:
+        keyout.write(SECRET_KEY)
 
 # With DEBUG off, Django checks that the Host header in requests matches one of
 # these. If you turn off DEBUG and you're suddenly getting HTTP 400 Bad
