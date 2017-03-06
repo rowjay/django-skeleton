@@ -19,6 +19,9 @@ from .common_settings import *
 # Set this to False for production deployments
 DEBUG = True
 
+if DEBUG:
+    LOGGING['root']['level'] = 'DEBUG'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 # This generates a secret key the first time it's accessed. For production
 # you will want to replace this entire block with something constant or
@@ -45,7 +48,19 @@ else:
 
 # Set your production database parameters here! See
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-#DATABASE=...
+#DATABASES=...
+
+def extra_context(request):
+    """Extra context variables to include in every template context
+
+    This function is referenced from the TEMPLATES setting from the common
+    settings file
+    """
+    return {
+        # Set this to your Google analytics key to enable google analytics in
+        # your base template
+        'GA': '',
+    }
 
 # When DEBUG is off, these email addresses will receive an email for any
 # unhandled exceptions while processing a request. See the logging

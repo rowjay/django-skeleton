@@ -59,6 +59,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'project.settings.extra_context',
             ],
         },
     },
@@ -236,7 +237,7 @@ LOGGING = {
     },
     "root": {
         "handlers": ["stderr"],
-        "level": "DEBUG" if DEBUG else "INFO",
+        "level": "INFO",
     }
 }
 
