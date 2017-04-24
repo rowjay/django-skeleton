@@ -1,5 +1,4 @@
 # Application
-project/settings.py
 *.sqlite3
 
 # Byte-compiled / optimized / DLL files

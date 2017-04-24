@@ -1,8 +1,7 @@
-Django<1.11
+Django<2.0
+django-environ
 colorlog
 
-# Uncomment for oauth
-# oauth2client
-
-# Uncomment for Sentry/Raven
-# raven
+# Optional Integrations
+oauth2client
+raven
