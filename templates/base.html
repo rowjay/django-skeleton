@@ -38,17 +38,18 @@
     </div>
 </nav>
 
-{% for message in messages %}
-    {% if message.level_tag == "info" %}
-        <div class="alert alert-info" role="alert">{{ message }}</div>
-    {% elif message.level_tag == "success" %}
-        <div class="alert alert-success" role="alert">{{ message }}</div>
-    {% elif message.level_tag == "warning" %}
-        <div class="alert alert-warning" role="alert">{{ message }}</div>
-    {% elif message.level_tag == "error" %}
-        <div class="alert alert-danger" role="alert">{{ message }}</div>
-    {% endif %}
-{% endfor %}
+{% block messages %}
+<div class="container">
+    {% for message in messages %}
+    <div class="alert alert-dismissable {{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
 
 <div class="container">
     {% block content %}{% endblock %}
