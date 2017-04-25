@@ -107,6 +107,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'project.utils.context_processors.google_analytics',
             ],
         },
     },
@@ -175,18 +176,7 @@ MESSAGE_TAGS = {
 
 
 # Google Analytics
-if env('GOOGLE_ANALYTICS_KEY'):
-    def ga_context(request):
-        """
-        Add Google Analytics tracking context
-        """
-        return {
-            'GA': env('GOOGLE_ANALYTICS_KEY'),
-        }
-
-    TEMPLATES[0]['OPTIONS']['context_processors'].append(
-        'project.settings.ga_context',
-    )
+GOOGLE_ANALYTICS_KEY = env('GOOGLE_ANALYTICS_KEY')
 
 
 # OAUTH 2
