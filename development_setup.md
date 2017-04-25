@@ -50,12 +50,12 @@ new or existing project.
    If some C extension modules depend on other libraries, you may need to
    install development headers for those as well.
 
-4. Create your settings file
+4. Create your .env ([dotenv](project#the-dotenv-convention)) file
 
-   Our Django setup has the project files in a directory called "project". In
-    there, copy the example settings file to "settings.py"
+   Our Django setup has the project files in a directory called "project". From
+   there, copy the example env file to the base directory.
 
-   ``` $ cp project/settings.ex.py project/settings.py ```
+   ```$ cp project/develop/env .env```
 
    For development you shouldn't need to edit this file at all. The default
    settings use an sqlite database called "db.sqlite3" and have reasonable

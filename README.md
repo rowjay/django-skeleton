@@ -1,6 +1,6 @@
 # Django Skeleton
 
-for Django 1.10. Should work with either Python 3.5 or 2.7 (3.5 is preferred)
+for Django 1.11. Should work with either Python 3.5+ or 2.7 (3.5 is preferred)
 
 ## Features
 Adds the following on top of Django's startproject template
@@ -47,15 +47,9 @@ The bare minimum to get a working project is:
    * In `common_settings.py` the INSTALLED_APPS setting
    * The import statement in the project-wide `urls.py`
 
-3. In the project directory, copy the `settings.ex.py` to `settings.py`. No
-   changes are needed for development. It is recommended to not check this
-   file in to version control. As per our convention, settings common to all
-   deployments go in `common_settings.py` which is checked in to version
-   control. Deployment-specific settings go in `settings.py` which is not
-   checked in to version control, or is checked in only on a
-   deployment-specific branch.
-
-   See the comments in settings.ex.py for more information.
+3. From the base directory, copy `project/develop/env` to `.env`. No
+   changes are needed for development. See the README in the `project`
+   directory for more information.
 
 4. Create your database and initial schemas with
    `./env/bin/python manage.py migrate`. The default database is a
