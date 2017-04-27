@@ -3,7 +3,7 @@ import os
 from contextlib import contextmanager
 from subprocess import check_call, Popen, PIPE
 
-from django.core.management.base import BaseCommand  # , CommandError
+from django.core.management.base import BaseCommand, CommandError
 from django.utils.timezone import now
 
 DATETIME_FORMAT = '%Y%m%d_%H%M%S'
@@ -48,6 +48,9 @@ class Command(BaseCommand):
             check_call(['mkdir', '-p', path])
             check_call(['tar', '-x', '-C', path], stdin=archive.stdout)
             archive.stdout.close()
+            archive.wait()
+            if archive.returncode > 0:
+                raise CommandError("'%s' is an invalid git reference" % ref)
 
         # javascript build
         if os.path.exists(os.path.join(path, 'package.json')):
