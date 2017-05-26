@@ -3,7 +3,7 @@
 import os
 from collections import deque
 from contextlib import contextmanager
-from subprocess import check_call, Popen, PIPE
+from subprocess import check_call, Popen, PIPE, CalledProcessError
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.timezone import now
@@ -50,7 +50,7 @@ class Command(BaseCommand):
             raise
         self.stdout.write(RESTORE + self.style.SUCCESS(success))
 
-    def stream(self, args, cwd=None):
+    def stream(self, args, cwd=None, check=True):
         """
         Stream the output of the subprocess
         """
@@ -64,6 +64,9 @@ class Command(BaseCommand):
             self.stdout.write(''.join(line_buffer))
             self.stdout.write(self.sep)
         process.wait()
+
+        if check and process.returncode != 0:
+            raise CalledProcessError(process.returncode, args)
 
     def handle(self, *args, **options):
         ref = options['ref']
