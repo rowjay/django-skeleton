@@ -57,13 +57,15 @@ class Command(BaseCommand):
         process = Popen(args, cwd=cwd, stdout=PIPE)
         line_buffer = deque(maxlen=self.rows - 20)
 
-        for line in iter(process.stdout.readline, ''):
-            line_buffer.append((u'    ' + line.decode('utf-8'))[:self.cols])
+        while process.poll() is None:
+            line = process.stdout.readline()
+            line = (u'    ' + line.decode('utf-8'))[:self.cols]
+            line_buffer.append(line)
+
             self.stdout.write(RESTORE)
             self.stdout.write(self.sep)
             self.stdout.write(''.join(line_buffer))
             self.stdout.write(self.sep)
-        process.wait()
 
         if check and process.returncode != 0:
             raise CalledProcessError(process.returncode, args)
