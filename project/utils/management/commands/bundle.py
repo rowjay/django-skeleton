@@ -2,21 +2,13 @@
 
 import os
 import sys
-from collections import deque
 from contextlib import contextmanager
 from subprocess import check_call, Popen, PIPE, CalledProcessError
-import time
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.timezone import now
 
 DATETIME_FORMAT = '%Y%m%d_%H%M%S'
-
-# saves cursor position
-SAVE = '\x1b7'
-
-# restores cursor position and clears remainder of screen
-RESTORE = '\x1b8\x1b[0J'
 
 class StepFail(BaseException):
     """Exception class to signal to the "step" context manager that execution
@@ -49,37 +41,34 @@ class Command(BaseCommand):
 
     @contextmanager
     def step(self, msg='', success='done', failure='fail'):
-        self.stdout.write('  - %s %s' % (msg, SAVE))
+        self.stdout.write('  - %s ' % (msg,), ending='')
         try:
             yield
         except Exception:
-            self.stdout.write(RESTORE + self.style.ERROR(failure))
+            self.stdout.write(self.style.ERROR(failure))
             raise
         except StepFail as e:
-            self.stdout.write(RESTORE + self.style.ERROR(str(e)))
+            self.stdout.write(self.style.ERROR(str(e)))
             sys.exit(1)
-        self.stdout.write(RESTORE + self.style.SUCCESS(success))
+        self.stdout.write(self.style.SUCCESS(success))
 
     def stream(self, args, cwd=None, check=True):
         """
         Stream the output of the subprocess
         """
-        process = Popen(args, cwd=cwd, stdout=PIPE)
-        line_buffer = deque(maxlen=self.rows - 20)
+        sys.stdout.write("\x1b7") # Save cursor pos
+        sys.stdout.write("\x1b[?1047h") # Set alternate screen
+        sys.stdout.flush()
+        try:
+            process = Popen(args, cwd=cwd)
+            process.wait()
 
-        while process.poll() is None:
-            line = process.stdout.readline()
-            line = (u'    ' + line.decode('utf-8'))[:self.cols]
-            line_buffer.append(line)
-
-            self.stdout.write(RESTORE)
-            self.stdout.write(self.sep)
-            for l in line_buffer:
-                self.stdout.write(l)
-            self.stdout.write(self.sep)
-
-        if check and process.returncode != 0:
-            raise CalledProcessError(process.returncode, args)
+            if check and process.returncode != 0:
+                raise CalledProcessError(process.returncode, args)
+        finally:
+            sys.stdout.write("\x1b[?1047l") # Reset to regular screen
+            sys.stdout.write("\x1b8") # Restore cursor pos
+            sys.stdout.flush()
 
     def handle(self, *args, **options):
         ref = options['ref']
