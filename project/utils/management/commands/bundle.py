@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 from collections import deque
 from contextlib import contextmanager
 from subprocess import check_call, Popen, PIPE, CalledProcessError
+import time
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.timezone import now
@@ -16,6 +18,11 @@ SAVE = '\x1b7'
 # restores cursor position and clears remainder of screen
 RESTORE = '\x1b8\x1b[0J'
 
+class StepFail(BaseException):
+    """Exception class to signal to the "step" context manager that execution
+    has failed, but not to dump a traceback
+
+    """
 
 class Command(BaseCommand):
     help = 'Build/bundle the application for deployment to production.'
@@ -48,6 +55,9 @@ class Command(BaseCommand):
         except Exception:
             self.stdout.write(RESTORE + self.style.ERROR(failure))
             raise
+        except StepFail as e:
+            self.stdout.write(RESTORE + self.style.ERROR(str(e)))
+            sys.exit(1)
         self.stdout.write(RESTORE + self.style.SUCCESS(success))
 
     def stream(self, args, cwd=None, check=True):
@@ -64,7 +74,8 @@ class Command(BaseCommand):
 
             self.stdout.write(RESTORE)
             self.stdout.write(self.sep)
-            self.stdout.write(''.join(line_buffer))
+            for l in line_buffer:
+                self.stdout.write(l)
             self.stdout.write(self.sep)
 
         if check and process.returncode != 0:
@@ -80,7 +91,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING(msg))
 
         # copy the project to archive directory
-        with self.step('Creating build directory at...'):
+        with self.step('Creating build directory at {} ...'.format(path)):
             archive = Popen(['git',  'archive', ref], stdout=PIPE)
             check_call(['mkdir', '-p', path])
             check_call(['tar', '-x', '-C', path], stdin=archive.stdout)
@@ -92,8 +103,15 @@ class Command(BaseCommand):
         # javascript build
         if os.path.exists(os.path.join(path, 'package.json')):
             with self.step('Found \'package.json\'. Building javascript...'):
-                self.stream(['npm', 'install', '--only=production'], cwd=path)
-                self.stream(['npm', 'run', 'build'], cwd=path)
+                try:
+                    self.stream(['npm', 'install', '--only=production'], cwd=path)
+                    self.stream(['npm', 'run', 'build'], cwd=path)
+                except OSError as e:
+                    raise StepFail("Could not execute NPM commands.\nIf you "
+                                   "don't need to build javascript bundles, "
+                                   "remove the package.json from "
+                                   "the repository.\nOriginal "
+                                   "exception was: {}".format(e)) from e
         else:
             self.stdout.write('  - No \'package.json\' found. Skipping javascript build.')
 
