@@ -82,7 +82,10 @@ blocks to override in sub-templates:
 Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployments. For this example we assume you are deploying your code to /opt/my-deployment-dir
 
 1. Clone a copy of your code to /opt/my-deployment-dir. This should put your
-   manage.py at /opt/my-deployment-dir/manage.py
+   manage.py at /opt/my-deployment-dir/manage.py.
+   
+   TODO: update this step with instructions involving the use of the deploy bundling scripts.
+   
 1. Install Nginx and supervisor system-wide
 2. Create a Python virtualenv and install your project’s dependencies +
    gunicorn into it. For this example the base dir is /opt/my-deployment-dir and
@@ -94,7 +97,7 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    ```
    [program:myproject]
    directory = /opt/my-deployment-dir
-   command = /opt/my-deployment-dir/env/bin/gunicorn --env DJANGO_SETTINGS_MODULE=project.settings --pythonpath /opt/my-deployment-dir/ --bind=unix:/opt/my-deployment-dir/gunicorn.sock project.wsgi
+   command = /opt/my-deployment-dir/env/bin/gunicorn --env DJANGO_SETTINGS_MODULE=project.deploy.settings --pythonpath /opt/my-deployment-dir/ --bind=unix:/opt/my-deployment-dir/gunicorn.sock project.wsgi
    stdout_logfile = /opt/my-deployment-dir/stdout.log
    redirect_stderr = true
    autostart = true
@@ -102,6 +105,8 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    user = project-user
    group = project-group
    ```
+   Note the use of the deployment settings file instead of the usual
+   project.settings file used for development.
 
    Note: for production deployments you may want to add e.g. `-w 4` to the
    gunicorn command to spawn multiple workers.
@@ -154,10 +159,14 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
 
 6. Copy the example env file to .env and configure:
 
-   * Configure the django project for /opt/my-deployment-dir/static-root to
-   be the STATIC_ROOT and run `manage.py collectstatic`. If the project is
-   using an alternate storage engine such as S3, configure that now and
-   then run collectstatic.
+   * If your project uses a local static directory, set STATIC_ROOT
+   to /opt/my-deployment-dir/static-root and run 
+   `manage.py collectstatic`. If the project is using an alternate
+   storage engine such as S3, configure that instead and
+   then run collectstatic. (See the project/deploy/settings.py
+   for the env variables your project expects)
+   * If your project uses a media root, set MEDIA_ROOT to a directory
+   that's writable by the web server.
    * Configure the database parameters and run `manage.py migrate`
    * If this is a production deployment, set DEBUG to false and set the
    ALLOWED_HOSTS list to the hostnames you're serving, e.g. "my-hostname.example.com"
@@ -255,21 +264,19 @@ like this:
 
    run `certbot renew --dry-run` to make sure everything looks okay
 
-   Edit root's crontab with `sudo crontab -e` and add this line:
+   Add the following to a file at `/etc/cron.d/letsencrypt`
 
    ```
-    RANDOM_DELAY=60
-    0 7 * * * certbot renew --quiet --post-hook "nginx -s reload"
+    MAILTO=admin-email@example.com
+    PATH=/sbin:/bin:/usr/sbin:/usr/bin
+    
+    15 10,22 * * * root certbot renew --quiet --post-hook "nginx -s reload"
    ```
-   This attempts renewal once a day at a random minute between 7 and 8am. The
-   renew command only actually renews if the cert expires within 30 days. It
-   is recommended to run this often in case the cert was revoked earlier
-   than expected
-
+   This checks twice a day if the cert needs renewal. You should adjust the exact
+   minute and hours attempted to random values, but it's not a huge deal.
+   
 ## Deployment notes and tips:
 
-* I like to make a git branch named for that deployment. For example, I may make a branch called "my-deployment.oscar.ncsu.edu" and check out that branch. Then I can continue to develop on the master branch, and merge changes into the deployment branch and follow the instructions below to update the deployment
-* With the above technique, I can check in any deployment-specific files such as settings.py to keep revisions and backups of critical files. Only push changes back if the remote repository is not public or if there are no secrets (such as db passwords) being checked in.
 * By default, Supervisor rotates the stdout log file after 50 megabytes and
   keeps 10 past backups. You may consider tweaking these parameters in the
   supervisor config.
@@ -287,16 +294,9 @@ like this:
   using some library that's being rude and doing its own writing to stderr
   instead of using python logging.
 
-* For production deployments, using Sentry is highly recommended. Add 'raven'
-  to the requirements.txt and uncomment the sentry lines from the example
-  settings file.
+* For production deployments, using Sentry is highly recommended. Make sure you
+include the sentry DSN in the env file.
 
 ## Deploying Changes
 
-To update a deployment with new changes:
-
-1. cd to /opt/my-deployment-dir
-2. run "git pull --ff-only". In general, you don't want to be doing any committing or merging out of the deployment working copy.
-3. run "./env/bin/python manage.py migrate" to update the database with any new schema changes
-4. run "./env/bin/python manage.py collectstatic" to update the static files
-5. run "sudo supervisorctl restart all" to restart all running gunicorn processes
+TODO: update this section with new deployment script instructions.
