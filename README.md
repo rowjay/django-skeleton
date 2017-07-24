@@ -152,13 +152,15 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    ```
    [Read more about the different context types that RedHat/CentOS uses with web servers](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html-single/Managing_Confined_Services/#sect-Managing_Confined_Services-The_Apache_HTTP_Server-Types)
 
-6. Copy the example settings.ex.py to settings.py and configure:
+6. Copy the example env file to .env and configure:
 
    * Configure the django project for /opt/my-deployment-dir/static-root to
-   be the STATIC_ROOT and run `manage.py collectstatic`
+   be the STATIC_ROOT and run `manage.py collectstatic`. If the project is
+   using an alternate storage engine such as S3, configure that now and
+   then run collectstatic.
    * Configure the database parameters and run `manage.py migrate`
    * If this is a production deployment, set DEBUG to false and set the
-   ALLOWED_HOSTS array to your hostnames you're serving, e.g. "my-hostname.example.com"
+   ALLOWED_HOSTS list to the hostnames you're serving, e.g. "my-hostname.example.com"
 
 7. sudo systemctl restart supervisord
 8. `sudo supervisorctl status` to make sure the workers started okay.
