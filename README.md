@@ -79,7 +79,9 @@ blocks to override in sub-templates:
 
 # Deployment Guide
 
-Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployments. For this example we assume you are deploying your code to /opt/my-deployment-dir
+Our usual setup is to use Nginx, Gunicorn, and Supervisor on production
+deployments. For this example we assume you are deploying your code to
+/opt/my-deployment-dir
 
 1. Clone a copy of your code to /opt/my-deployment-dir. This should put your
    manage.py at /opt/my-deployment-dir/manage.py.
@@ -97,7 +99,7 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
    ```
    [program:myproject]
    directory = /opt/my-deployment-dir
-   command = /opt/my-deployment-dir/env/bin/gunicorn --env DJANGO_SETTINGS_MODULE=project.deploy.settings --pythonpath /opt/my-deployment-dir/ --bind=unix:/opt/my-deployment-dir/gunicorn.sock project.wsgi
+   command = /opt/my-deployment-dir/env/bin/gunicorn --pythonpath /opt/my-deployment-dir/ --bind=unix:/opt/my-deployment-dir/gunicorn.sock project.wsgi
    stdout_logfile = /opt/my-deployment-dir/stdout.log
    redirect_stderr = true
    autostart = true
@@ -159,6 +161,8 @@ Our usual setup is to use Nginx, Gunicorn, and Supervisor on production deployme
 
 6. Copy the example env file to .env and configure:
 
+   * Set the settings module to the production settings: 
+   `DJANGO_SETTINGS_MODULE=project.deploy.settings`
    * If your project uses a local static directory, set STATIC_ROOT
    to /opt/my-deployment-dir/static-root and run 
    `manage.py collectstatic`. If the project is using an alternate

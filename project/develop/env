@@ -2,6 +2,10 @@
 # Copy this file to path/to/BASE_DIR/.env
 # Note that these settings are *not* secure.
 
+# Leave this alone for development, change to project.deploy.settings for
+# production
+DJANGO_SETTINGS_MODULE=project.settings
+
 DEBUG=true
 SECRET_KEY="not-so-secret"
 
