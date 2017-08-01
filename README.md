@@ -16,16 +16,23 @@ Adds the following on top of Django's startproject template
   * `password_change_done.html` has a success message and a link to the
     'home' view
 
-* A settings file split into a `common_settings.py` and `settings.ex.py`.
+* A settings file split into a `common_settings.py` and `settings.py` with a 
+  separate production settings
+* Pulls in most deployment-specific settings from the environment using 
+  Django-environ
 * Settings configured for a top-level static files directory
 * Settings configured for a top-level templates directory
 * Settings configured with a good default logging configuration
-* Settings configured to auto-generate a secret key on first invocation
 * A starter `.gitignore`
 * A starter `requirements.txt`
 * Defined urls for django built-in authentication views (login,
   logout, and password change) and settings configured to use them
   (`LOGIN_URL`, `LOGOUT_URL`, and `LOGIN_REDIRECT_URL`).
+* An oauth app built with oauth2client, for SSO login support
+* A deployment script for bundling other dependencies such as static 
+  files and javascript bundles
+* Sentry support
+* Google Analytics support
 
 ## Getting Started
 The bare minimum to get a working project is:
@@ -33,7 +40,8 @@ The bare minimum to get a working project is:
 1. Create a virtual environment and install the requirements listed in
    `requirements.txt`
 
-   * In this directory, run `virtualenv -p /usr/bin/python3.5 env`
+   * In this directory, run `python3 -m venv env` to create the virtual 
+   environment.
    * Now run `env/bin/pip install -r requirements.txt`
    * For convenience in later commands, activate your virtualenv for this
      terminal with `source ./env/bin/activate`. You can replace
@@ -58,26 +66,7 @@ The bare minimum to get a working project is:
 5. You now have a working development environment. Run the django test server
    with `./env/bin/python manage.py runserver`
 
-## About base.html
-
-The base template is a simple bootstrap-based html template. It has 4 content
-blocks to override in sub-templates:
-
-* `header` is used to insert items into the header of the page, such as
-  stylesheets.
-* `content` is where all your content should go. It is placed inside a
-  `<div>` with class `container`
-* `scripts` is a block at the very end of the body, which can be used to
-  insert javascript blocks.
-* `title` overrides the document title.
-
-## Notes
-
-* A view named 'home' is referenced in the starter templates and in the
-  `LOGIN_REDIRECT_URL` setting. If you change the home view to be named
-  something else, make sure you update these references.
-
-# Deployment Guide
+# Deployment Guide for Production
 
 Our usual setup is to use Nginx, Gunicorn, and Supervisor on production
 deployments. For this example we assume you are deploying your code to
@@ -107,9 +96,6 @@ deployments. For this example we assume you are deploying your code to
    user = project-user
    group = project-group
    ```
-   Note the use of the deployment settings file instead of the usual
-   project.settings file used for development.
-
    Note: for production deployments you may want to add e.g. `-w 4` to the
    gunicorn command to spawn multiple workers.
 
