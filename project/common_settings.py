@@ -53,7 +53,7 @@ LOGIN_REDIRECT_URL = reverse_lazy('home')
 # https://docs.djangoproject.com/en/1.11/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'oauth.authbackend.OAuthBackend',
+    #'oauth.authbackend.OAuthBackend',
 ]
 
 
@@ -82,6 +82,7 @@ INSTALLED_APPS = [
 
     'project.utils',
     'appname',
+    #'oauth',
 ]
 
 MIDDLEWARE = [
