@@ -99,7 +99,8 @@ deployments. For this example we assume you are deploying your code to
    Note: for production deployments you may want to add e.g. `-w 4` to the
    gunicorn command to spawn multiple workers.
 
-5. Create an nginx config in /etc/nginx/conf.d/myproject.conf containing:
+5. Create an nginx config in /etc/nginx/conf.d/myproject.conf (but see below 
+if you want an SSL version):
 
    ```
    upstream gunicorn {
@@ -178,7 +179,8 @@ and <https://certbot.eff.org/#centosrhel7-nginx>)
 
 1. `yum install certbot` (assumes CentOS7 and epel repos installed)
 2. Create a directory somewhere on the filesystem such as /opt/webroot
-3. Add a new location block to your nginx config that looks like this:
+3. If you have an existing non-ssl configuration, add a new location block to 
+your nginx config that looks like this:
 
    ```
    location ~ /.well-known {
@@ -186,33 +188,38 @@ and <https://certbot.eff.org/#centosrhel7-nginx>)
    }
    ```
    and reload nginx with `nginx -s reload`
+   
+   This will let certbot use the web server to perform the domain validation 
+   in the next step. You can use whatever webroot path you want.
 
 3. Run `certbot certonly`
 
    This will ask you for your domain name and web root. If successful, it
-   will go ahead and issue you your cert
+   will go ahead and issue you your cert. If you don't have an existing 
+   non-ssl deployment (starting from scratch) then choose certbot's "spin up 
+   a temporary web server" option for this step.
 
 4. Generate strong dh parameters with
 
    ```openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048```
 
-5. Modify your nginx config. Add a new server block at the top that looks
-like this:
+5. Modify your nginx config. This is the SSL template for a new deployment:
 
-   ```
-   server {
-        listen 80;
+    ```
+    upstream gunicorn {
+        server unix:/opt/my-deployment-dir/gunicorn.sock fail_timeout=0;
+    }
+    
+    server {
+         listen 80;
+         server_name my-hostname.example.com;
+         return 301 https://$server_name$request_uri;
+    }
+
+    server {
+        listen 443 ssl;
         server_name my-hostname.example.com;
-        return 301 https://$server_name$request_uri;
-   }
-   ```
-
-   And then modify your existing server block by replacing the listen line
-   with:
-   ```listen 443 ssl;```
-
-   And adding these parameters:
-   ```
+        
         ssl_certificate /etc/letsencrypt/live/my-hostname.example.com/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/my-hostname.example.com/privkey.pem;
         ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -227,15 +234,33 @@ like this:
         add_header X-Frame-Options DENY;
         add_header X-Content-Type-Options nostiff;
         ssl_dhparam /etc/ssl/certs/dhparam.pem;
-   ```
-   (That full set of parameters will score you an A on ssl testers, but not
-   all of them may be necessary)
 
-   Make sure this line is in your `location /` block:
+        location /static/ {
+            alias /opt/my-deployment-dir/static-root/;
+        }
+        location ~ /.well-known {
+            root /opt/webroot;
+        }
+        location / {
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_pass http://gunicorn;
+        }
+    }
+    ```
 
-   ```   proxy_set_header X-Forwarded-Proto $scheme```
+    This makes the following changes from the non-SSL config from above:
+    * Adds a new server block for port 80 that redirects to the https version
+    * Changes the old block to listen on 443 using ssl
+    * Adds a block of SSL configuration.
+    
+    Make sure to change the hostname in the `server_name` directives and in 
+    the certificate paths. Also the web root for the well-known path if you 
+    changed it.
 
-   Test and reload your nginx config
+   Now test and reload your nginx config
 
    ```
    # nginx -t
@@ -252,7 +277,20 @@ like this:
 
 7. Configure certbot to renew certificates automatically:
 
-   run `certbot renew --dry-run` to make sure everything looks okay
+   run `certbot renew --dry-run` to make sure everything looks okay. If you 
+   initially had certbot spin up a temporary web server, you may need to 
+   reconfigure it to use a webroot.
+   
+   1. Open the file at `/etc/letsencrypt/renewal/my-hostname.example.com.conf`
+   2. Change the line `authenticator = standalone` to `authenticator = webroot`
+   3. Add these lines at the bottom of the file:
+   
+      ```
+      [[webroot_map]]
+      my-hostname.example.com = /opt/webroot
+      ```
+      
+   4. Run `certbot renew --dry-run` to make sure it works
 
    Add the following to a file at `/etc/cron.d/letsencrypt`
 
