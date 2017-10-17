@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import sys
 from contextlib import contextmanager
 from subprocess import check_call, Popen, PIPE, CalledProcessError
@@ -10,11 +11,13 @@ from django.utils.timezone import now
 
 DATETIME_FORMAT = '%Y%m%d_%H%M%S'
 
-class StepFail(BaseException):
-    """Exception class to signal to the "step" context manager that execution
-    has failed, but not to dump a traceback
 
+class StepFail(BaseException):
     """
+    Exception class to signal to the "step" context manager that execution
+    has failed, but not to dump a traceback
+    """
+
 
 class Command(BaseCommand):
     help = 'Build/bundle the application for deployment to production.'
@@ -56,8 +59,8 @@ class Command(BaseCommand):
         """
         Stream the output of the subprocess
         """
-        sys.stdout.write("\x1b7") # Save cursor pos
-        sys.stdout.write("\x1b[?1047h") # Set alternate screen
+        sys.stdout.write("\x1b7")  # Save cursor pos
+        sys.stdout.write("\x1b[?1047h")  # Set alternate screen
         sys.stdout.flush()
         try:
             process = Popen(args, cwd=cwd)
@@ -66,8 +69,8 @@ class Command(BaseCommand):
             if check and process.returncode != 0:
                 raise CalledProcessError(process.returncode, args)
         finally:
-            sys.stdout.write("\x1b[?1047l") # Reset to regular screen
-            sys.stdout.write("\x1b8") # Restore cursor pos
+            sys.stdout.write("\x1b[?1047l")  # Reset to regular screen
+            sys.stdout.write("\x1b8")  # Restore cursor pos
             sys.stdout.flush()
 
     def handle(self, *args, **options):
@@ -108,6 +111,13 @@ class Command(BaseCommand):
         with self.step('Writing bundle...'):
             self.stream(['zip', '-r', os.path.abspath(out), '.'], cwd=path)
         self.stdout.write('')
+
+        if os.path.exists('.elasticbeanstalk/config.yml'):
+            with self.step('Updating eb config...'):
+                with open('.elasticbeanstalk/config.yml') as config:
+                    text = config.read()
+                with open('.elasticbeanstalk/config.yml', 'w') as config:
+                    config.write(re.sub(r'bundles/.*.zip', out, text))
 
         # write paths to stdout
         if not out.startswith(path):
