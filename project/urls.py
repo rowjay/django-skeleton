@@ -16,32 +16,28 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-import django.contrib.auth.views
+from project import views
 
-from appname import urls
+
+___password_reset_confirm = r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$'
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
     # Uncomment for oauth support
-    #url(r'^oauth/', include("oauth.urls")),
+    # url(r'^oauth/', include("oauth.urls")),
 
     # Auth urls
-    url(r'^accounts/login$', django.contrib.auth.views.login,
-        {'template_name': 'login.html'},
-        name="login"),
-    url(r'^accounts/logout$', django.contrib.auth.views.logout,
-        {'template_name': 'logout.html'},
-        name="logout"),
-    url(r'^accounts/change_password$',
-        django.contrib.auth.views.password_change,
-        {'template_name': 'password_change.html',
-         'post_change_redirect':
-             'django.contrib.auth.views.password_change_done'},
-        name="change_password"),
-    url(r'^accounts/change_password_done$',
-        django.contrib.auth.views.password_change_done,
-        {'template_name': 'password_change_done.html'}),
+    url(r'^login/$',                    views.LoginView.as_view(),                  name='login'),
+    url(r'^logout/$',                   views.LogoutView.as_view(),                 name='logout'),
 
-    url(r'', include(urls)),
+    url(r'^password_change/$',          views.PasswordChangeView.as_view(),         name='password_change'),
+    url(r'^password_change/done/$',     views.PasswordChangeDoneView.as_view(),     name='password_change_done'),
+
+    url(r'^password_reset/$',           views.PasswordResetView.as_view(),          name='password_reset'),
+    url(r'^password_reset/done/$',      views.PasswordResetDoneView.as_view(),      name='password_reset_done'),
+    url(___password_reset_confirm,      views.PasswordResetConfirmView.as_view(),   name='password_reset_confirm'),
+    url(r'^reset/done/$',               views.PasswordResetCompleteView.as_view(),  name='password_reset_complete'),
+
+    url(r'^', include('appname.urls')),
 ]
