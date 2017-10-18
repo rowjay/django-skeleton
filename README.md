@@ -33,6 +33,7 @@ Adds the following on top of Django's startproject template
   files and javascript bundles
 * Sentry support
 * Google Analytics support
+* Favicon placeholder
 
 ## Getting Started
 The bare minimum to get a working project is:
